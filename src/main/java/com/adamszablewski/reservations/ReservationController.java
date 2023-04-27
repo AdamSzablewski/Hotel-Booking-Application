@@ -29,6 +29,15 @@ public class ReservationController {
     public List<Reservation> getReservationsByEmail(@PathVariable String email){
         return reservationService.findAllReservationsForUserByEmail(email);
     }
+    @GetMapping("/reservations/email/{email}")
+    public List<Reservation> getReservationsByPhoneNuber(@PathVariable String phoneNumber){
+        return reservationService.findAllReservationsForUserByPhoneNumber(phoneNumber);
+    }
+
+    @GetMapping("/reservations/rooms/{room_id}")
+    public List<Reservation> getReservationsForRoom(@PathVariable int room_id){
+        return reservationService.findAllReservationsForRoom(room_id);
+    }
 
     @PostMapping("/reservations")
     public ResponseEntity<String> createReservation(@RequestBody @Valid Reservation reservation){

@@ -37,6 +37,12 @@ public class ReservationService {
         return user.getReservations();
     }
 
+    public List<Reservation> findAllReservationsForUserByPhoneNumber(String phoneNumber) {
+        Optional<UserInfo> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        UserInfo user = optionalUser.get();
+        return user.getReservations();
+    }
+
     public List<Reservation> findAllReservationsForRoom(int roomNumber) {
         Optional<Room> optionalUser = roomRepository.findById(roomNumber);
         Room room = optionalUser.get();
@@ -131,4 +137,6 @@ public class ReservationService {
         }
         return ResponseEntity.ok("All reservations for user have been cancelled ");
     }
+
+
 }
