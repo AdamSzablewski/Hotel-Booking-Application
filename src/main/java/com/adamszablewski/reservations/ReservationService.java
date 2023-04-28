@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +34,28 @@ public class ReservationService {
 
     public List<Reservation> findAllReservationsForUserByEmail(String email) {
         Optional<UserInfo> optionalUser = userRepository.findByUsername(email);
+        if (optionalUser.isEmpty()) {
+            return new ArrayList<>();
+        }
         UserInfo user = optionalUser.get();
         return user.getReservations();
     }
 
     public List<Reservation> findAllReservationsForUserByPhoneNumber(String phoneNumber) {
         Optional<UserInfo> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        if (optionalUser.isEmpty()) {
+            return new ArrayList<>();
+        }
         UserInfo user = optionalUser.get();
         return user.getReservations();
     }
 
     public List<Reservation> findAllReservationsForRoom(int roomNumber) {
-        Optional<Room> optionalUser = roomRepository.findById(roomNumber);
-        Room room = optionalUser.get();
+        Optional<Room> optionalRoom = roomRepository.findById(roomNumber);
+        if (optionalRoom.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Room room = optionalRoom.get();
         return room.getReservations();
 
     }
@@ -60,22 +70,23 @@ public class ReservationService {
         int numOfGuests = reservation.getGuests();
         double roomPricetemp = 0;
         boolean roomsAvailable = false;
-        List<Room> availableRooms = new ArrayList<>();
-        List<Room> allRooms = roomService.findAllRooms();
-            for (Room room : allRooms){
-                if (room.getMaxNumberOfGuests() >= numOfGuests &&
-                        room.getRoomCategory().equals(reservation.getRoomClass())
-                            && roomAvailabilityCheck.isAvailableDuringPeriod(room, reservation)){
-                    if(!roomsAvailable){
-                        roomPricetemp = room.getPricePerNight();
-                        availableRooms.add(room);
-                    }
-                    roomsAvailable = true;
-                }
-            }
+//        List<Room> availableRoomsForReservation = new ArrayList<>();
+//        List<Room> allRooms = roomService.findAllRooms();
+//            for (Room room : allRooms){
+//                if (room.getMaxNumberOfGuests() >= numOfGuests &&
+//                        room.getRoomCategory().equals(reservation.getRoomClass())
+//                            && roomAvailabilityCheck.isAvailableDuringPeriod(room, reservation)){
+//                    if(!roomsAvailable){
+//                        roomPricetemp = room.getPricePerNight();
+//                        availableRoomsForReservation.add(room);
+//                    }
+//                    roomsAvailable = true;
+//                }
+//            }
+        List<Room> selectedRooms = roomService.findAvailableRoomsForReservation(reservation);
 
-        if (roomsAvailable) {
-            reservation.setRooms(availableRooms);
+        if (!selectedRooms.isEmpty()) {
+            reservation.setRooms(selectedRooms);
             reservation.setTotalPrice(0);
             reservationRepository.save(reservation);
             reservation.setTotalPrice(roomPrice.calculateTotalRoomPrice(reservation));
@@ -139,4 +150,7 @@ public class ReservationService {
     }
 
 
+    public List<Reservation> findAllReservationsByDateRange(LocalDate startDate, LocalDate endDate) {
+        return reservationRepository.findByArrivalBetween(startDate, endDate);
+    }
 }

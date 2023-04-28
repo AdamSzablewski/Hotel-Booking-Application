@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class ReservationController {
     public List<Reservation> getReservationsByEmail(@PathVariable String email){
         return reservationService.findAllReservationsForUserByEmail(email);
     }
-    @GetMapping("/reservations/email/{email}")
+    @GetMapping("/reservations/phone-number/{phoneNumber}")
     public List<Reservation> getReservationsByPhoneNuber(@PathVariable String phoneNumber){
         return reservationService.findAllReservationsForUserByPhoneNumber(phoneNumber);
     }
@@ -38,6 +39,13 @@ public class ReservationController {
     public List<Reservation> getReservationsForRoom(@PathVariable int room_id){
         return reservationService.findAllReservationsForRoom(room_id);
     }
+
+    @GetMapping("/reservations/dateRange")
+    public List<Reservation> getReservationsByDateRange(@RequestParam("startDate") LocalDate startDate,
+                                                        @RequestParam("endDate") LocalDate endDate){
+        return reservationService.findAllReservationsByDateRange(startDate, endDate);
+    }
+
 
     @PostMapping("/reservations")
     public ResponseEntity<String> createReservation(@RequestBody @Valid Reservation reservation){
