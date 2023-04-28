@@ -54,7 +54,7 @@ public class Reservation {
     @Future(message = "The arrival date must be in the future")
     private LocalDate departure;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "reservation_room",
             joinColumns = @JoinColumn(name = "reservation_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))

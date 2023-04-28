@@ -26,6 +26,8 @@ public class UserInfo {
     @Column(name = "last_name")
     private String lastName;
 
+    private String discountLevel;
+
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -40,6 +42,7 @@ public class UserInfo {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
+
 
     public void addPoints(double points) {
         this.points = points;

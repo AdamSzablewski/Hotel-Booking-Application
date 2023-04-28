@@ -9,6 +9,7 @@ import com.adamszablewski.users.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -67,23 +68,14 @@ public class ReservationService {
     }
 
     public ResponseEntity<String> createReservation(Reservation reservation) {
-        int numOfGuests = reservation.getGuests();
-        double roomPricetemp = 0;
-        boolean roomsAvailable = false;
-//        List<Room> availableRoomsForReservation = new ArrayList<>();
-//        List<Room> allRooms = roomService.findAllRooms();
-//            for (Room room : allRooms){
-//                if (room.getMaxNumberOfGuests() >= numOfGuests &&
-//                        room.getRoomCategory().equals(reservation.getRoomClass())
-//                            && roomAvailabilityCheck.isAvailableDuringPeriod(room, reservation)){
-//                    if(!roomsAvailable){
-//                        roomPricetemp = room.getPricePerNight();
-//                        availableRoomsForReservation.add(room);
-//                    }
-//                    roomsAvailable = true;
-//                }
-//            }
+
+        double avgRoomPricetemp = 0;
         List<Room> selectedRooms = roomService.findAvailableRoomsForReservation(reservation);
+        double sum = 0;
+        for (Room room : selectedRooms){
+            sum += room.getPricePerNight();
+        }
+        avgRoomPricetemp = sum / selectedRooms.size();
 
         if (!selectedRooms.isEmpty()) {
             reservation.setRooms(selectedRooms);
@@ -94,8 +86,9 @@ public class ReservationService {
             UserInfo user = optionalUser.get();
             reservation.setUser(user);
 
-            user.addPoints(roomPrice.calculatePointsForUser(roomPricetemp * reservation.getNumberOfNights(reservation)));
-            roomPrice.calculatePointsForUser(roomPricetemp);
+
+            user.addPoints(roomPrice.calculatePointsForUser(avgRoomPricetemp * reservation.getNumberOfNights(reservation)));
+            userRepository.save(user);
             reservationRepository.save(reservation);
             //todo add price and number of night information as return
             return ResponseEntity.ok("Reservation created");
@@ -120,34 +113,31 @@ public class ReservationService {
 
     public ResponseEntity<String> deleteReservationById(Long res_id) {
 
-        Optional<Reservation> optionalReservation = reservationRepository.findById(res_id);
-        if (optionalReservation.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Reservation existingReservation = optionalReservation.get();
-
-
-        List<Room> rooms = existingReservation.getRooms();
-        for(Room room : rooms){
-            roomRepository.save(room);
-        }
         reservationRepository.deleteById(res_id);
         return ResponseEntity.ok("Reservation cancelled");
     }
 
+    @Transactional
     public ResponseEntity<String> deleteAllForUserByEmail(String email){
-//todo fix this method not deleting reservations
         List<Reservation> reservations = findAllReservationsForUserByEmail(email);
-
         if (reservations.isEmpty()) {
             return ResponseEntity.ok("No reservations found for user");
         }
-
-        for (Reservation reservation : reservations){
-            deleteReservationById(reservation.getId());
+        Optional<UserInfo> optionalUser = userRepository.findByUsername(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.ok("No users with this email were found");
         }
+        UserInfo user = optionalUser.get();
+        user.setReservations(new ArrayList<>());
+        userRepository.save(user);
+
+        for (Reservation reservation : reservations) {
+            reservationRepository.deleteById(reservation.getId());
+        }
+
         return ResponseEntity.ok("All reservations for user have been cancelled ");
     }
+
 
 
     public List<Reservation> findAllReservationsByDateRange(LocalDate startDate, LocalDate endDate) {

@@ -34,12 +34,21 @@ public class RoomPrice {
         double currentPoints = user.getPoints();
 
         if(currentPoints >= 10000){
+            if(!user.getDiscountLevel().equals("30%")){
+                user.setDiscountLevel("30%");
+            }
             return  0.7;
         }
         else if(currentPoints >= 5000){
+            if(!user.getDiscountLevel().equals("15%")){
+                user.setDiscountLevel("15%");
+            }
             return  0.85;
         }
         else if(currentPoints >= 1000){
+            if(!user.getDiscountLevel().equals("10%")){
+                user.setDiscountLevel("10%");
+            }
             return  0.9;
         }
         return 1;
