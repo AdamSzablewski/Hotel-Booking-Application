@@ -1,9 +1,9 @@
-insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
-values (1, 'Adam', 'Sz', 'adam@test.com','a1', '09893434','0%', 0);
-insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD,  PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
-values (2, 'John', 'Ad', 'john@test.com','a1', '05678','0%', 1200);
-insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD,  PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
-values (3, 'Test', 'T', 'test@test.com','a1', '01','0%', 200);
+--insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
+--values (1, 'Adam', 'Sz', 'adam@test.com','a1', '09893434','0%', 0);
+--insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD,  PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
+--values (2, 'John', 'Ad', 'john@test.com','a1', '05678','0%', 1200);
+--insert into USER_INFO (ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD,  PHONE_NUMBER, DISCOUNT_LEVEL, POINTS)
+--values (3, 'Test', 'T', 'test@test.com','a1', '01','0%', 200);
 
 
 insert into ROOM (ID, MAX_NUMBER_OF_GUESTS, PRICE_PER_NIGHT, ROOM_CATEGORY)

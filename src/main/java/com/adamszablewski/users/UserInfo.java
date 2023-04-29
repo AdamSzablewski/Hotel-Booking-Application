@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,6 +23,11 @@ public class UserInfo {
 
     @Column(name = "first_name")
     private String name;
+
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+//        inverseJoinColumns = @JoinColumn(name = "id", referencedColumnName = "user_id"))
+//    private List<Role> roles = new ArrayList<>();
 
     @Column(name = "last_name")
     private String lastName;
