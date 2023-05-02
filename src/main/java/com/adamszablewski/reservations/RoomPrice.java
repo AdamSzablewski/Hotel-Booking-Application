@@ -1,6 +1,7 @@
 package com.adamszablewski.reservations;
 
 import com.adamszablewski.rooms.Room;
+import com.adamszablewski.rooms.RoomService;
 import com.adamszablewski.users.UserInfo;
 import com.adamszablewski.users.UserRepository;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class RoomPrice {
 
     UserRepository userRepository;
+    RoomService roomService;
 
 
     private double calculateBasicPrice(Reservation reservation){
@@ -60,5 +62,15 @@ public class RoomPrice {
 
     public double calculatePointsForUser(double spent){
         return spent * 2;
+    }
+
+    public double calculateAvgRoomPrice(List<Room> rooms){
+
+
+        double sum = 0;
+        for (Room room : rooms){
+            sum += room.getPricePerNight();
+        }
+        return  sum / rooms.size();
     }
 }

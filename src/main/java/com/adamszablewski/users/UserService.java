@@ -84,4 +84,10 @@ public class UserService {
         return ResponseEntity.ok("User deleted");
     }
 
+    public ResponseEntity<UserInfo> changeAuthoritiesForUserByEmail(String email, UserInfo userInfo) {
+        Optional<UserInfo> optionalUser = userRepository.findByUsername(email);
+        UserInfo user = optionalUser.get();
+        user.setRoles(userInfo.getRoles());
+        return ResponseEntity.ok(user);
+    }
 }

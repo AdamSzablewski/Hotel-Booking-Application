@@ -69,13 +69,9 @@ public class ReservationService {
 
     public ResponseEntity<String> createReservation(Reservation reservation) {
 
-        double avgRoomPricetemp = 0;
+
         List<Room> selectedRooms = roomService.findAvailableRoomsForReservation(reservation);
-        double sum = 0;
-        for (Room room : selectedRooms){
-            sum += room.getPricePerNight();
-        }
-        avgRoomPricetemp = sum / selectedRooms.size();
+        double avgRoomPricetemp = roomPrice.calculateAvgRoomPrice(selectedRooms);
 
         if (!selectedRooms.isEmpty()) {
             reservation.setRooms(selectedRooms);
@@ -112,12 +108,11 @@ public class ReservationService {
     }
 
     public ResponseEntity<String> deleteReservationById(Long res_id) {
-
         reservationRepository.deleteById(res_id);
         return ResponseEntity.ok("Reservation cancelled");
     }
 
-    @Transactional
+
     public ResponseEntity<String> deleteAllForUserByEmail(String email){
         List<Reservation> reservations = findAllReservationsForUserByEmail(email);
         if (reservations.isEmpty()) {

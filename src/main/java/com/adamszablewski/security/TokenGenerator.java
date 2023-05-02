@@ -1,6 +1,7 @@
 package com.adamszablewski.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -16,6 +17,8 @@ public class TokenGenerator {
         String username = authentication.getName();
         Date currentDate = new Date();
         Date expireDate = new Date(System.currentTimeMillis() + 1000 * 60 * 24);
+
+
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(currentDate)

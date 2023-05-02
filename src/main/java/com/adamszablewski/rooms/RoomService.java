@@ -25,9 +25,9 @@ public class RoomService {
         return roomRepository.findById(room_id);
     }
 
-    public ResponseEntity<Room> createRoom(Room room) {
+    public Room createRoom(Room room) {
         roomRepository.save(room);
-        return ResponseEntity.ok(room);
+        return room;
     }
     public ResponseEntity<Room> updateRoomById(int room_id, Room room) {
         Optional<Room> optionalRoom = roomRepository.findById(room_id);

@@ -4,9 +4,11 @@ package com.adamszablewski.security;
 import com.adamszablewski.dto.AuthResponseDto;
 import com.adamszablewski.dto.LoginDto;
 import com.adamszablewski.dto.RegisterDto;
+import com.adamszablewski.role.Role;
+import com.adamszablewski.role.RoleRepository;
 import com.adamszablewski.users.UserInfo;
 import com.adamszablewski.users.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,31 +16,26 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/auth")
+@Service
+@AllArgsConstructor
 public class AuthController {
 
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-
+    private RoleRepository roleRepository;
     private TokenGenerator tokenGenerator;
 
-    @Autowired
-    public AuthController(AuthenticationManager authenticationManager,
-                         UserRepository userRepository,
-                         PasswordEncoder passwordEncoder,
-                          TokenGenerator tokenGenerator) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenGenerator = tokenGenerator;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegisterDto registerDto){
@@ -50,20 +47,24 @@ public class AuthController {
         user.setName(registerDto.getFirstName());
         user.setLastName(registerDto.getLastName());
         user.setPhoneNumber(registerDto.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+        Role role = roleRepository.findByName("CUSTOMER").get();
+        System.out.println(role);
+        user.setRoles(Collections.singletonList(role));
+        String password = passwordEncoder.encode(registerDto.getPassword());
+        user.setPassword(password);
+        System.out.println(password);
         user.setDiscountLevel("");
-        
+
 
         userRepository.save(user);
         return new ResponseEntity<>("User registered", HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto){
-        System.out.println(loginDto);
-
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto user){
+        System.out.println(user);
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenGenerator.generateToken(authentication);
 

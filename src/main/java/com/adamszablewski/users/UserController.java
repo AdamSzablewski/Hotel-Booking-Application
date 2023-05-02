@@ -54,7 +54,10 @@ public class UserController {
         return userService.deleteUserByEmail(email);
     }
 
-
+    @PatchMapping("/users/authorities/{email}")
+    public ResponseEntity<UserInfo> changeAuthorities(@PathVariable String email, @RequestBody UserInfo userInfo){
+        return userService.changeAuthoritiesForUserByEmail(email, userInfo);
+    }
 
 
 

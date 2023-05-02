@@ -3,6 +3,9 @@ package com.adamszablewski.rooms;
 import com.adamszablewski.users.UserInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +28,8 @@ public class RoomController {
     }
 
     @PostMapping("/rooms")
-    public ResponseEntity<Room> createRoom(@RequestBody Room room){
+    public Room createRoom(@RequestBody Room room) {
+
         return roomService.createRoom(room);
     }
 
