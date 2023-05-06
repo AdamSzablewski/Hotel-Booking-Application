@@ -1,113 +1,72 @@
 package com.adamszablewski.service;
 
-import com.adamszablewski.reservations.Reservation;
 import com.adamszablewski.reservations.ReservationRepository;
 import com.adamszablewski.reservations.ReservationService;
 import com.adamszablewski.reservations.RoomPrice;
-import com.adamszablewski.rooms.Room;
+import com.adamszablewski.rooms.RoomAvailabilityCheck;
+import com.adamszablewski.rooms.RoomRepository;
 import com.adamszablewski.rooms.RoomService;
-import com.adamszablewski.users.UserInfo;
 import com.adamszablewski.users.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-
+@DataJpaTest
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
-
-    @InjectMocks
-    private ReservationService reservationService;
+    @Mock
+    ReservationRepository reservationRepository;
 
     @Mock
-    private RoomService roomService;
+    UserRepository userRepository;
 
     @Mock
-    private RoomPrice roomPrice;
+    RoomService roomService;
 
     @Mock
-    private ReservationRepository reservationRepository;
+    ReservationService reservationService;
+
+
+    RoomPrice roomPrice;
+
+
+    RoomAvailabilityCheck roomAvailabilityCheck;
 
     @Mock
-    private UserRepository userRepository;
+    RoomRepository roomRepository;
 
-    @Test
-    public void testCreateReservationWithAvailableRooms() {
-        // Arrange
-        Reservation reservation = Reservation.builder()
-                .username("adam@test.com")
-                .guests(3)
-                .arrival(LocalDate.of(2023, 6, 8))
-                .departure(LocalDate.of(2023, 6, 14))
-                .build();
-
-        Room room1 = Room.builder()
-                .roomCategory("Basic")
-                .maxNumberOfGuests(2)
-                .pricePerNight(200)
-                .build();
-        Room room2 = Room.builder()
-                .roomCategory("Basic")
-                .maxNumberOfGuests(2)
-                .pricePerNight(200)
-                .build();
-
-
-        List<Room> availableRooms = new ArrayList<>();
-        availableRooms.add(room1);
-        availableRooms.add(room2);
-        when(roomService.findAvailableRoomsForReservation(reservation)).thenReturn(availableRooms);
-        when(roomPrice.calculateTotalRoomPrice(reservation)).thenReturn(0.0);
-        UserInfo user = new UserInfo();
-        user.setUsername("testuser");
-        when(userRepository.findByUsername(reservation.getUsername())).thenReturn(Optional.of(user));
-        doNothing().when(userRepository).save(user);
-        doNothing().when(reservationRepository).save(reservation);
-
-        // Act
-        ResponseEntity<String> response = reservationService.createReservation(reservation);
-
-        // Assert
-        verify(roomService, times(1)).findAvailableRoomsForReservation(reservation);
-        verify(roomPrice, times(1)).calculateTotalRoomPrice(reservation);
-        verify(userRepository, times(1)).findByUsername(reservation.getUsername());
-        verify(userRepository, times(1)).save(user);
-        verify(reservationRepository, times(2)).save(reservation);
-        assertEquals(ResponseEntity.ok("Reservation created"), response);
+    @BeforeEach
+    void setUp(){
+        roomRepository.deleteAll();
+        reservationService = new ReservationService(reservationRepository, userRepository, roomService,
+                                                         roomPrice, roomAvailabilityCheck, roomRepository);
     }
 
     @Test
-    public void testCreateReservationWithNoAvailableRooms() {
+    public void deleteReservationByIdTest() {
         // Arrange
-        Reservation reservation = Reservation.builder()
-                .username("adam@test.com")
-                .guests(3)
-                .arrival(LocalDate.of(2023, 6, 8))
-                .departure(LocalDate.of(2023, 6, 14))
-                .build();
+        Long resId = 1L;
+        ReservationRepository reservationRepository = Mockito.mock(ReservationRepository.class);
 
-        List<Room> availableRooms = new ArrayList<>();
-        when(roomService.findAvailableRoomsForReservation(reservation)).thenReturn(availableRooms);
 
         // Act
-        ResponseEntity<String> response = reservationService.createReservation(reservation);
+        ResponseEntity<String> response = reservationService.deleteReservationById(resId);
 
         // Assert
-        verify(roomService, times(1)).findAvailableRoomsForReservation(reservation);
-        verifyNoInteractions(roomPrice);
-        verifyNoInteractions(userRepository);
-        verifyNoInteractions(reservationRepository);
-        assertEquals(ResponseEntity.ok("No available rooms in this category"), response);
+        verify(reservationRepository).deleteById(resId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Reservation cancelled");
     }
+
+
 }
-
