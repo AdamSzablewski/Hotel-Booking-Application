@@ -3,6 +3,7 @@ package com.adamszablewski.rooms;
 import com.adamszablewski.reservations.Reservation;
 import com.adamszablewski.users.UserInfo;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,8 @@ public class RoomService {
     }
 
     public ResponseEntity<String> deleteRoomById(int room_id) {
+        if (!roomRepository.existsById(room_id)) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
         roomRepository.deleteById(room_id);
         return ResponseEntity.ok("Room removed");
     }

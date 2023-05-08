@@ -84,12 +84,27 @@ public class RoomServiceTest {
     @Test
     public void deleteRoomByIdTest_RemoveSuccessfull() {
         int roomId = 1;
+        when(roomRepository.existsById(roomId)).thenReturn(true);
         ResponseEntity<String> response = roomService.deleteRoomById(roomId);
 
+        verify(roomRepository).existsById(roomId);
         verify(roomRepository).deleteById(roomId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo("Room removed");
+    }
+
+    @Test
+    public void deleteRoomByIdTest_RemoveNotSuccessfull() {
+        int roomId = 1;
+        when(roomRepository.existsById(roomId)).thenReturn(false);
+        ResponseEntity<String> response = roomService.deleteRoomById(roomId);
+
+        verify(roomRepository).existsById(roomId);
+
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
     }
 
     @Test
@@ -133,7 +148,7 @@ public class RoomServiceTest {
                 .pricePerNight(250)
                 .build();
 
-        when(roomRepository.findById(id)).thenReturn(Optional.ofNullable(null));
+        when(roomRepository.findById(id)).thenReturn(Optional.empty());
 
         ResponseEntity<Room> response = roomService.updateRoomById(id, room);
 

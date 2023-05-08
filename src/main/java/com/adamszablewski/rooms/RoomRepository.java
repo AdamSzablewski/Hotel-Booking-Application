@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Integer> {
 
+    Boolean existsById(int id);
 }

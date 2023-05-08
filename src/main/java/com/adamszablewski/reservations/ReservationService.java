@@ -7,6 +7,7 @@ import com.adamszablewski.rooms.RoomService;
 import com.adamszablewski.users.UserInfo;
 import com.adamszablewski.users.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,6 +109,8 @@ public class ReservationService {
     }
 
     public ResponseEntity<String> deleteReservationById(Long res_id) {
+        if (!reservationRepository.existsById(res_id)) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
         reservationRepository.deleteById(res_id);
         return ResponseEntity.ok("Reservation cancelled");
     }
