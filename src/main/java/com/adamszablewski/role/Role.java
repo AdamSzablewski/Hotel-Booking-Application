@@ -3,7 +3,7 @@ package com.adamszablewski.role;
 import jakarta.persistence.*;
 import lombok.Data;
 
-//@Entity
+
 @Data
 @Entity
 public class Role {

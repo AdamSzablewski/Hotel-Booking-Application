@@ -1,6 +1,7 @@
 package com.adamszablewski.users;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,14 +43,15 @@ public class UserService {
 
     }
 
-    public ResponseEntity<UserInfo> updatePasswordByEmail(String email, UserInfo userInfo) {
+    public ResponseEntity<String> updatePasswordByEmail(String email, UserInfo userInfo) {
         Optional<UserInfo> optionalUser = userRepository.findByUsername(email);
         if (optionalUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         UserInfo existingUser = optionalUser.get();
         existingUser.setPassword(userInfo.getPassword());
-        return ResponseEntity.ok(existingUser);
+        userRepository.save(existingUser);
+        return ResponseEntity.ok("Password changed successfully");
 
     }
 

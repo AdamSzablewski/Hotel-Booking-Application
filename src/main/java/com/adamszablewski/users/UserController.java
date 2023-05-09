@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/id/password/{email}")
-        public ResponseEntity<UserInfo> changePassword(@PathVariable String email, @RequestBody UserInfo userInfo) {
+        public ResponseEntity<String> changePassword(@PathVariable String email, @RequestBody UserInfo userInfo) {
             return userService.updatePasswordByEmail(email, userInfo);
     }
 

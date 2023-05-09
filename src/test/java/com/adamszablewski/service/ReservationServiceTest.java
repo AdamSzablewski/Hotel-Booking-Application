@@ -130,11 +130,11 @@ public class ReservationServiceTest {
         reservations.add(r1);
         reservations.add(r2);
         user.setReservations(reservations);
-        when(userRepository.findByPhoneNumber(user.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByPhoneNumber(user.getPhoneNumber())).thenReturn(Optional.of(user));
 
 
 
-        List<Reservation> result = reservationService.findAllReservationsForUserByPhoneNumber(user.getUsername());
+        List<Reservation> result = reservationService.findAllReservationsForUserByPhoneNumber(user.getPhoneNumber());
 
 
         verify(userRepository).findByPhoneNumber(user.getPhoneNumber());

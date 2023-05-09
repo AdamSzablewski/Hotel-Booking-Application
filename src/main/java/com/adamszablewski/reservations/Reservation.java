@@ -41,7 +41,7 @@ public class Reservation {
     @Min(value = 1, message = "The number of guests must be at least 1")
     private int guests;
 
-    //@NotEmpty(message = "The room class must not be empty")
+
     private String roomClass;
 
     @NotEmpty(message = "The room class must not be empty")
