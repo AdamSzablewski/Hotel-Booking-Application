@@ -246,7 +246,7 @@ public class ReservationServiceTest {
         List<Room> reservations = new ArrayList<>();
         when(roomService.findAvailableRoomsForReservation(reservation)).thenReturn(reservations);
 
-        
+
         ResponseEntity<String> response = reservationService.createReservation(reservation);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -254,6 +254,47 @@ public class ReservationServiceTest {
 
     }
 
+    @Test
+    public void updateReservationById_ShouldUpdate(){
+        Reservation reservation = Reservation.builder()
+                .id(1L)
+                .arrival(LocalDate.of(2023, 7, 8))
+                .departure(LocalDate.of(2023, 7, 16))
+                .username("testuser@test.com")
+                .totalPrice(200)
+                .guests(2)
+                .build();
+
+        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(roomPrice.calculateTotalRoomPrice(reservation)).thenReturn(100.00);
+        when(reservationRepository.save(reservation)).thenReturn(reservation);
+
+        ResponseEntity<Reservation> response = reservationService.updateReservationById(reservation.getId(), reservation);
+
+        verify(reservationRepository).findById(1L);
+        verify(roomPrice).calculateTotalRoomPrice(reservation);
+        verify(reservationRepository).save(reservation);
+        assertThat(response.getBody().getTotalPrice()).isEqualTo(reservation.getTotalPrice());
+    }
+
+    @Test
+    public void updateReservationById_ShouldNotUpdate(){
+        Reservation reservation = Reservation.builder()
+                .id(1L)
+                .arrival(LocalDate.of(2023, 7, 8))
+                .departure(LocalDate.of(2023, 7, 16))
+                .username("testuser@test.com")
+                .totalPrice(200)
+                .guests(2)
+                .build();
+
+        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.empty());
+
+        ResponseEntity<Reservation> response = reservationService.updateReservationById(reservation.getId(), reservation);
+
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
 
 
 
